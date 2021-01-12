@@ -45,7 +45,7 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
         String imageUrl;
 
         holder.title.setText(product.getTitle());
-        holder.reflections.setText(product.getTitle());
+        holder.price.setText(product.getPrice());
         //holder.name.setText(product.getUserName());
         imageUrl = product.getImageUrl();
 
@@ -67,7 +67,7 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
 
     public class ViewHolder extends RecyclerView.ViewHolder{
 
-        public TextView title, reflections, dateAdded, name;
+        public TextView title, price, dateAdded, name;
         public ImageView image;
         String userId;
         String username;
@@ -75,10 +75,10 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
         public ViewHolder(@NonNull View itemView, Context ctx) {
             super(itemView);
             context = ctx;
-            title = itemView.findViewById(R.id.product_title_list);
-            reflections = itemView.findViewById(R.id.product_description_list);
+            title = itemView.findViewById(R.id.txtTitle);
+            price = itemView.findViewById(R.id.txtPrice);
             dateAdded = itemView.findViewById((R.id.product_time_stamp));
-            image = itemView.findViewById(R.id.product_image_list);
+            image = itemView.findViewById(R.id.img_item);
             //name = itemView.findViewById(R.id.username_account);
 
 

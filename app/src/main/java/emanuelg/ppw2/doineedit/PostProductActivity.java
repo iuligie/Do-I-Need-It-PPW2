@@ -135,38 +135,35 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     private void saveJournal() {
 
         final String title = titleEdittext.getText().toString().trim();
-        final String products = reflectionEditText.getText().toString().trim();
+        final String price = reflectionEditText.getText().toString().trim();
 
         progressBar.setVisibility(View.VISIBLE);
 
-        if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(products) && imageUri != null) {
+        if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) && imageUri != null) {
             //saving image
             final StorageReference filepath = storageReference.child("reflection_images").child("my_image_" + Timestamp.now().getSeconds());
             //making the image filenames unique with timestamp
 
-            filepath.putFile(imageUri).addOnSuccessListener(taskSnapshot -> filepath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                @Override
-                public void onSuccess(Uri uri) {
+            filepath.putFile(imageUri).addOnSuccessListener(taskSnapshot -> filepath.getDownloadUrl().addOnSuccessListener(uri -> {
 
-                    String imageUrl = uri.toString();
+                String imageUrl = uri.toString();
 
-                    // create journal object, invoke collectionRef, save journal instance
+                // create journal object, invoke collectionRef, save journal instance
 
-                    Product product = new Product();
-                    product.setTitle(title);
-                    //product.setProduct(products);
-                    product.setImageUrl(imageUrl);
-                    product.setTimeAdded(new Timestamp(new Date()));
-                    product.setUserName(currentUserName);
-                    product.setUserId(currentUserId);
+                Product product = new Product();
+                product.setTitle(title);
+                product.setPrice(price);
+                product.setImageUrl(imageUrl);
+                product.setTimeAdded(new Timestamp(new Date()));
+                product.setUserName(currentUserName);
+                product.setUserId(currentUserId);
 
-                    collectionReference.add(product).addOnSuccessListener(documentReference -> {
-                        progressBar.setVisibility(View.INVISIBLE);
+                collectionReference.add(product).addOnSuccessListener(documentReference -> {
+                    progressBar.setVisibility(View.INVISIBLE);
 
-                        startActivity(new Intent(PostProductActivity.this, ProductListActivity.class));
-                        finish();
-                    }).addOnFailureListener(e -> Log.d(TAG, "onFailure: " + e.getMessage()));
-                }
+                    startActivity(new Intent(PostProductActivity.this, ProductListActivity.class));
+                    finish();
+                }).addOnFailureListener(e -> Log.d(TAG, "onFailure: " + e.getMessage()));
             }).addOnFailureListener(e -> Log.d(TAG, "onFailure: " + e.getMessage()))).addOnFailureListener(e -> progressBar.setVisibility(View.INVISIBLE));
         } else {
             progressBar.setVisibility(View.INVISIBLE);

@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import emanuelg.ppw2.doineedit.MainActivity;
 import emanuelg.ppw2.doineedit.R;
 import emanuelg.ppw2.doineedit.list.ProductListActivity;
+import emanuelg.ppw2.doineedit.util.ProductApi;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -88,6 +89,8 @@ public class LoginActivity extends AppCompatActivity {
     private void updateUI(FirebaseUser user) {
         if (user != null) {
             Intent intent = new Intent(this, ProductListActivity.class);
+            ProductApi.getInstance().setUserId(user.getUid());
+            ProductApi.getInstance().setUsername(user.getDisplayName());
             startActivity(intent);
         } else {
             Log.d("CurrentUserCheck", "not logged in or something went wrong");

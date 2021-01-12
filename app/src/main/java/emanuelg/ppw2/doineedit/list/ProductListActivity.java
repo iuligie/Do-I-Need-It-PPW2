@@ -2,6 +2,7 @@ package emanuelg.ppw2.doineedit.list;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,7 +45,7 @@ public class ProductListActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private ProductRecyclerAdapter productRecyclerAdapter;
 
-    private CollectionReference collectionReference = db.collection("Product");
+    private CollectionReference collectionReference = db.collection("Reflection");
     private TextView noReflectionEntry;
 
 
@@ -124,7 +125,7 @@ public class ProductListActivity extends AppCompatActivity {
 
                 })
                 .addOnFailureListener(e -> {
-
+                    Log.d("DB-LOG", "onFailure: " + e.getMessage());
                 });
     }
 }
