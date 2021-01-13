@@ -11,13 +11,14 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -26,7 +27,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 
@@ -47,6 +48,9 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     private TextView currentUserTextView;
     private TextView reflectionDate;
     private ImageView imageView;
+    Product current;
+
+    ProductApi api=ProductApi.getInstance();
 
     private String currentUserId;
     private String currentUserName;
@@ -59,7 +63,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private StorageReference storageReference;
 
-    private CollectionReference collectionReference = db.collection("Reflection");
+    private CollectionReference collectionReference = db.collection("Products");
     private Uri imageUri;
 
 
@@ -76,7 +80,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
         progressBar = findViewById(R.id.post_progress_bar);
         titleEdittext = findViewById(R.id.post_title_et);
         reflectionEditText = findViewById(R.id.post_description_et);
-        saveButton = findViewById(R.id.post_save_reflection_button);
+        saveButton = findViewById(R.id.post_save_item_button);
         currentUserTextView = findViewById(R.id.post_username_textview);
         addPhotoButton = findViewById(R.id.postCameraButton);
 
@@ -87,6 +91,23 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
 
         progressBar.setVisibility(View.INVISIBLE);
 
+        String itemPos = api.getCurrentItemPos();
+
+        if(itemPos!=null)
+        {
+
+          current = api.getProductList().get(Integer.parseInt(itemPos));
+            titleEdittext.setText(current.getTitle());
+            reflectionEditText.setText(current.getPrice());
+            //imageView.setImageURI(current.getImageUrl());
+            //use picasso library to download and show image
+            Picasso.get().load(current.getImageUrl())
+                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .fit()
+                    .into(imageView);
+            //imageUri= current.getImageUrl();
+            saveButton.setText("Update");
+        }
 
         if (ProductApi.getInstance() != null) {
             currentUserId = ProductApi.getInstance().getUserId();
@@ -98,13 +119,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
         authStateListener = firebaseAuth -> {
 
             user = firebaseAuth.getCurrentUser();
-            if (user != null) {
-
-
-            } else {
-
-
-            }
+           // if (user != null) {} else {}
         };
 
 
@@ -114,11 +129,15 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     public void onClick(View view) {
 
         switch (view.getId()) {
-            case R.id.post_save_reflection_button:
+            case R.id.post_save_item_button:
                 //save the reflection
 
-                saveJournal();
 
+                if(current!=null)
+                updateItem(current);
+                else{
+                    saveItem();
+                }
                 break;
 
             case R.id.postCameraButton:
@@ -131,17 +150,75 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
                 break;
         }
     }
+    private void updateItem(final Product item){
 
-    private void saveJournal() {
-
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
         final String title = titleEdittext.getText().toString().trim();
         final String price = reflectionEditText.getText().toString().trim();
+      //  if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) ) {
+            //region Image Handler
+            final StorageReference filepath = storageReference.child("reflection_images").child("my_image_" + Timestamp.now().getSeconds());
+            //making the image filenames unique with timestamp
+            if (!imageUri.toString().equals(item.getImageUrl()) && imageUri!=null)
+            filepath.putFile(imageUri)
+                    .addOnSuccessListener
+                            (
+                            taskSnapshot -> filepath.getDownloadUrl()
+                    .addOnSuccessListener(
+                            uri -> {
+
+                String imageUrl = uri.toString();
+//region docHandler
+                DocumentReference itemRef = db
+                        .collection("Reflection")
+                        .document(item.getItemId());
+
+                /*itemRef.update(
+                        "title", title,
+                        "price", price,
+                        "imageUrl", imageUrl
+                ).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(PostProductActivity.this, "Item updated!", Toast.LENGTH_LONG).show();
+                            startActivity(new Intent(PostProductActivity.this, ProductListActivity.class));
+                            finish();
+                        } else {
+                            Toast.makeText(PostProductActivity.this, "Something went wrong - check log", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                */
+                //endregion
+
+
+            }
+                                         )
+                    .addOnFailureListener(
+                            e -> Log.d(TAG, "onFailure: " + e.getMessage())
+                                         )
+                            )
+                    .addOnFailureListener(
+                            e -> progressBar.setVisibility(View.INVISIBLE)
+                                         );
+
+       // }
+        //endregion
+
+
+
+    }
+    private void saveItem() {
+
+        final String title = titleEdittext.getText().toString().trim();
+        final String price = "£" + reflectionEditText.getText().toString().trim();
 
         progressBar.setVisibility(View.VISIBLE);
 
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) && imageUri != null) {
             //saving image
-            final StorageReference filepath = storageReference.child("reflection_images").child("my_image_" + Timestamp.now().getSeconds());
+           final StorageReference filepath = storageReference.child("reflection_images").child("my_image_" + Timestamp.now().getSeconds());
             //making the image filenames unique with timestamp
 
             filepath.putFile(imageUri).addOnSuccessListener(taskSnapshot -> filepath.getDownloadUrl().addOnSuccessListener(uri -> {
@@ -155,7 +232,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
                 product.setPrice(price);
                 product.setImageUrl(imageUrl);
                 product.setTimeAdded(new Timestamp(new Date()));
-                product.setUserName(currentUserName);
+                product.setItemId(currentUserName);
                 product.setUserId(currentUserId);
 
                 collectionReference.add(product).addOnSuccessListener(documentReference -> {
@@ -163,12 +240,16 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
 
                     startActivity(new Intent(PostProductActivity.this, ProductListActivity.class));
                     finish();
-                }).addOnFailureListener(e -> Log.d(TAG, "onFailure: " + e.getMessage()));
-            }).addOnFailureListener(e -> Log.d(TAG, "onFailure: " + e.getMessage()))).addOnFailureListener(e -> progressBar.setVisibility(View.INVISIBLE));
+                })
+                        .addOnFailureListener(e -> Log.d(TAG, "onFailure: " + e.getMessage()));
+            }).addOnFailureListener(e -> Log.d(TAG, "onFailure: " + e.getMessage())))
+                    .addOnFailureListener(e -> progressBar.setVisibility(View.INVISIBLE));
         } else {
             progressBar.setVisibility(View.INVISIBLE);
+            Toast.makeText(this, "Can not submit empty fields", Toast.LENGTH_LONG).show();
         }
     }
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {

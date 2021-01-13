@@ -1,6 +1,18 @@
 package emanuelg.ppw2.doineedit.model;
 
+import android.net.Uri;
+import android.util.Log;
+
+import androidx.annotation.NonNull;
+
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Product {
 
@@ -9,8 +21,8 @@ public class Product {
     private String imageUrl;
     private String userId;
     private Timestamp timeAdded;
-    private String userName;
-
+    private String itemId;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
     //empty constructor for firestore // must have
 
     public Product() {
@@ -18,14 +30,16 @@ public class Product {
 
     }
 
-    public Product(String title, String price, String imageUrl, String userId, Timestamp timeAdded, String userName) {
+    public Product(String title, String price, String imageUrl, String userId, Timestamp timeAdded, String itemId) {
         this.title = title;
         this.price = price;
         this.imageUrl = imageUrl;
         this.userId = userId;
         this.timeAdded = timeAdded;
-        this.userName = userName;
+        this.itemId = itemId;
     }
+
+
 
     public String getTitle() {
         return title;
@@ -67,11 +81,20 @@ public class Product {
         this.timeAdded = timeAdded;
     }
 
-    public String getUserName() {
-        return userName;
+    public String getItemId() {
+        return itemId;
     }
 
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setItemId(String itemId) {
+        this.itemId = itemId;
+    }
+
+    public Serializable toMap() {
+        Map<String,String> map = new HashMap<>();
+        map.put("title",getTitle());
+        map.put("price",getPrice());
+        map.put("image",getImageUrl());
+
+        return (Serializable) map;
     }
 }

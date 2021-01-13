@@ -1,57 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:gravity="center"
-    android:padding="24dp"
+    android:scaleX="1.2"
+    android:scaleY="1.2"
     tools:context=".MainActivity">
+
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="64dp"
         android:fontFamily="@font/roboto_slab_bold"
         android:text="@string/title_text"
-        android:textSize="30sp" />
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:id="@+id/relativeLayout">
+        android:textSize="30sp"
+        app:layout_constraintEnd_toEndOf="@+id/cardView"
+        app:layout_constraintStart_toStartOf="@+id/cardView"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.cardview.widget.CardView
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="383dp"
+        android:layout_height="155dp"
+        android:contentDescription="@string/todo"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.428"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintVertical_bias="0.05"
+        app:srcCompat="@drawable/thinking_face_emoji_large" />
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="0dp"
+        android:layout_height="97dp"
+        app:cardCornerRadius="4dp"
+        app:cardElevation="6dp"
+        app:cardUseCompatPadding="true"
+        app:layout_constraintBottom_toTopOf="@+id/startButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="@+id/startButton"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintVertical_bias="0.768">
+
+        <TextView
+            android:id="@+id/reflectionText"
             android:layout_width="match_parent"
-            android:layout_height="90dp"
-            app:cardElevation="6dp"
-            app:cardCornerRadius="4dp"
-            app:cardUseCompatPadding="true"
-            >
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:scaleY="1"
+            android:text="@string/manage_your_needs_now"
+            android:textSize="30sp" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:id="@+id/reflectionText"
-                android:text="@string/productText"
-                android:textSize="19sp"
-                />
-
-        </androidx.cardview.widget.CardView>
-
-
-
-    </RelativeLayout>
+    </androidx.cardview.widget.CardView>
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/startButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="188dp"
+        android:background="@drawable/rounded_button"
         android:text="@string/get_started_text"
         android:textColor="#fff"
-        android:background="@drawable/rounded_button"
-        />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:textSize="30sp" />
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
