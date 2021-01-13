@@ -13,12 +13,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -44,9 +41,9 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     private ProgressBar progressBar;
     private ImageView addPhotoButton;
     private EditText titleEdittext;
-    private EditText reflectionEditText;
+    private EditText priceEdittext;
     private TextView currentUserTextView;
-    private TextView reflectionDate;
+    private TextView entryDate;
     private ImageView imageView;
     Product current;
     private boolean hasNewImg=false;
@@ -70,7 +67,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_post_reflection);
+        setContentView(R.layout.activity_post_item);
 
 
         storageReference = FirebaseStorage.getInstance().getReference();
@@ -79,7 +76,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
         firebaseAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.post_progress_bar);
         titleEdittext = findViewById(R.id.post_title_et);
-        reflectionEditText = findViewById(R.id.post_description_et);
+        priceEdittext = findViewById(R.id.post_description_et);
         saveButton = findViewById(R.id.post_save_item_button);
         currentUserTextView = findViewById(R.id.post_username_textview);
         addPhotoButton = findViewById(R.id.postCameraButton);
@@ -98,7 +95,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
 
           current = api.getProductList().get(Integer.parseInt(itemPos));
             titleEdittext.setText(current.getTitle());
-            reflectionEditText.setText(current.getPrice());
+            priceEdittext.setText(current.getPrice());
             //imageView.setImageURI(current.getImageUrl());
             //use picasso library to download and show image
             Picasso.get().load(current.getImageUrl())
@@ -130,7 +127,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
 
         switch (view.getId()) {
             case R.id.post_save_item_button:
-                //save the reflection
+                //save the item
 
 
                 if(current!=null)
@@ -184,8 +181,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final String title = titleEdittext.getText().toString().trim();
-        final String price = reflectionEditText.getText().toString().trim();
-
+        final String price = priceEdittext.getText().toString().trim();
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) ) {
             //region docHandler
             DocumentReference itemRef = db
@@ -212,13 +208,13 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     private void saveItem() {
 
         final String title = titleEdittext.getText().toString().trim();
-        final String price = "£" + reflectionEditText.getText().toString().trim();
+        final String price = "£" + priceEdittext.getText().toString().trim();
 
         progressBar.setVisibility(View.VISIBLE);
 
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) && imageUri != null) {
             //saving image
-           final StorageReference filepath = storageReference.child("reflection_images").child("my_image_" + Timestamp.now().getSeconds());
+           final StorageReference filepath = storageReference.child("img_items").child("my_image_" + Timestamp.now().getSeconds());
             //making the image filenames unique with timestamp
 
             filepath.putFile(imageUri).addOnSuccessListener(taskSnapshot -> filepath.getDownloadUrl().addOnSuccessListener(uri -> {

@@ -58,5 +58,7 @@
     <string name="price_in_gbp">Price in GBP</string>
     <string name="textview">TextView</string>
     <string name="today">Today</string>
+    <string name="Update">Update</string>
+    <string name="date_created">Date created</string>
 
 </resources>

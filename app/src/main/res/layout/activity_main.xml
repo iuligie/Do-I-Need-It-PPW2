@@ -5,75 +5,55 @@
     android:id="@+id/linearLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:background="#000000"
     android:scaleX="1.2"
     android:scaleY="1.2"
     tools:context=".MainActivity">
 
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="64dp"
-        android:fontFamily="@font/roboto_slab_bold"
-        android:text="@string/title_text"
-        android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="@+id/cardView"
-        app:layout_constraintStart_toStartOf="@+id/cardView"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageView
         android:id="@+id/imageView"
-        android:layout_width="383dp"
-        android:layout_height="155dp"
-        android:contentDescription="@string/todo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.428"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constraintVertical_bias="0.05"
-        app:srcCompat="@drawable/thinking_face_emoji_large" />
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardView"
         android:layout_width="0dp"
-        android:layout_height="97dp"
-        app:cardCornerRadius="4dp"
-        app:cardElevation="6dp"
-        app:cardUseCompatPadding="true"
+        android:layout_height="296dp"
+        android:layout_marginTop="108dp"
+        android:contentDescription="@string/todo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/thinking_face_emoji_large"
+        tools:srcCompat="@drawable/thinking_face_emoji_large" />
+
+    <TextView
+        android:id="@+id/txtGetStartedTitle"
+        android:layout_width="0dp"
+        android:layout_height="84dp"
+        android:layout_marginTop="72dp"
+        android:layout_marginBottom="72dp"
+        android:fontFamily="@font/roboto_slab_bold"
+        android:text="@string/title_text"
+        android:textAlignment="center"
+        android:textColor="@color/color_title"
+        android:textSize="36sp"
         app:layout_constraintBottom_toTopOf="@+id/startButton"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
-        app:layout_constraintStart_toStartOf="@+id/startButton"
-        app:layout_constraintTop_toBottomOf="@+id/title"
-        app:layout_constraintVertical_bias="0.768">
-
-        <TextView
-            android:id="@+id/reflectionText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:scaleY="1"
-            android:text="@string/manage_your_needs_now"
-            android:textSize="30sp" />
-
-    </androidx.cardview.widget.CardView>
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
     <Button
         android:id="@+id/startButton"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="188dp"
+        android:layout_height="48dp"
+        android:layout_marginBottom="76dp"
         android:background="@drawable/rounded_button"
+        android:gravity="center"
         android:text="@string/get_started_text"
+        android:textAlignment="center"
         android:textColor="#fff"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:textSize="30sp" />
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

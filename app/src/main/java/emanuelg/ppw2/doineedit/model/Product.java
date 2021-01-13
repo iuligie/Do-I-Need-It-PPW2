@@ -22,6 +22,16 @@ public class Product {
     private String userId;
     private Timestamp timeAdded;
     private String itemId;
+
+    public boolean isOwned() {
+        return owned;
+    }
+
+    public void setOwned(boolean owned) {
+        this.owned = owned;
+    }
+
+    private boolean owned;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     //empty constructor for firestore // must have
 
@@ -30,13 +40,14 @@ public class Product {
 
     }
 
-    public Product(String title, String price, String imageUrl, String userId, Timestamp timeAdded, String itemId) {
+    public Product(String title, String price, String imageUrl, String userId, Timestamp timeAdded, String itemId, boolean owned) {
         this.title = title;
         this.price = price;
         this.imageUrl = imageUrl;
         this.userId = userId;
         this.timeAdded = timeAdded;
         this.itemId = itemId;
+        this.owned=owned;
     }
 
 

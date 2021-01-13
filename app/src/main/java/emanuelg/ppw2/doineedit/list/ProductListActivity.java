@@ -16,14 +16,11 @@ import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
@@ -49,21 +46,21 @@ public class ProductListActivity extends AppCompatActivity {
     private ProductRecyclerAdapter productRecyclerAdapter;
 
     private CollectionReference collectionReference = db.collection("Products");
-    private TextView noReflectionEntry;
+    private TextView noItemEntry;
     ProductApi api=ProductApi.getInstance();
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_reflection_list);
+        setContentView(R.layout.activity_item_list);
 
         firebaseAuth = FirebaseAuth.getInstance();
         user = firebaseAuth.getCurrentUser();
 
 
         productList = new ArrayList<>();
-        noReflectionEntry = findViewById(R.id.list_no_reflection);
+        noItemEntry = findViewById(R.id.list_no_item);
         recyclerView = findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -99,16 +96,17 @@ public class ProductListActivity extends AppCompatActivity {
             }
         }).attachToRecyclerView(recyclerView);
     }
-void sendSMS(Product item)
-{
-    Intent intent = new Intent(Intent.ACTION_SENDTO);
-    intent.setData(Uri.parse("smsto:07904868145"));
-    intent.putExtra("sms_body","Hey! Check out this product! \n-> "+ item.getTitle() + " <-\n" + "It is only $" + item.getPrice() + "!");
-    if(intent.resolveActivity(getPackageManager())!=null)
+
+    void sendSMS(Product item)
     {
-        startActivity(intent);
+        Intent intent = new Intent(Intent.ACTION_SENDTO);
+        intent.setData(Uri.parse("smsto:07904868145"));
+        intent.putExtra("sms_body","Hey! Check out this product! \n-> "+ item.getTitle() + " <-\n" + "It is only $" + item.getPrice() + "!");
+        if(intent.resolveActivity(getPackageManager())!=null)
+        {
+            startActivity(intent);
+        }
     }
-}
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu, menu);
@@ -121,7 +119,7 @@ void sendSMS(Product item)
         switch (item.getItemId()){
 
             case R.id.action_add:
-                //take user to add reflection
+                //take user to add items
                 if (user != null && firebaseAuth != null){
                     startActivity(new Intent(ProductListActivity.this, PostProductActivity.class));
                     //finish();
@@ -167,7 +165,7 @@ void sendSMS(Product item)
                     productRecyclerAdapter.notifyDataSetChanged();
                 }
                 else{
-                    noReflectionEntry.setVisibility(View.VISIBLE);
+                    noItemEntry.setVisibility(View.VISIBLE);
                 }
 
 

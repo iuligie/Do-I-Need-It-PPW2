@@ -2,12 +2,12 @@ package emanuelg.ppw2.doineedit.ui;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,11 +17,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import emanuelg.ppw2.doineedit.PostProductActivity;
 import emanuelg.ppw2.doineedit.R;
+
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
-import emanuelg.ppw2.doineedit.list.ProductListActivity;
 import emanuelg.ppw2.doineedit.model.Product;
 import emanuelg.ppw2.doineedit.util.ProductApi;
 
@@ -40,7 +42,7 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
     @Override
     public ProductRecyclerAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
 
-        View view = LayoutInflater.from(context).inflate(R.layout.reflection_row, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.item_row, parent, false);
         api.setProductList(productList);
 
         return new ViewHolder(view, context);
@@ -54,7 +56,7 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
 
         holder.title.setText(product.getTitle());
         holder.price.setText(product.getPrice());
-
+        holder.owned.setChecked(product.isOwned());
         //holder.name.setText(product.getUserName());
         imageUrl = product.getImageUrl();
 
@@ -77,10 +79,12 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
     public Product getItemAt(int position){
         return productList.get(position);
     }
+
     public class ViewHolder extends RecyclerView.ViewHolder{
 
         public TextView title, price, dateAdded, name;
         public ImageView image;
+        public CheckBox owned;
        // String userId;
         //String username;
 
@@ -91,6 +95,25 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
             price = itemView.findViewById(R.id.txtPrice);
             dateAdded = itemView.findViewById((R.id.product_time_stamp));
             image = itemView.findViewById(R.id.img_item);
+            owned=itemView.findViewById(R.id.owned_checkbox);
+
+            owned.setOnCheckedChangeListener((buttonView, isChecked) -> {
+                Product item = getItemAt(getAdapterPosition());
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                DocumentReference itemRef = db
+                        .collection("Products")
+                        .document(item.getItemId());
+
+                itemRef.update("owned", isChecked
+                ).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(ctx, "New item set to owned!", Toast.LENGTH_LONG).show();
+
+                    } else {
+                        Toast.makeText(ctx, "Something went wrong - check log", Toast.LENGTH_LONG).show();
+                    }
+                });
+            });
             //name = itemView.findViewById(R.id.username_account);
             itemView.setOnLongClickListener(v -> {
                 Toast.makeText(v.getContext(), "Long Click Detected", Toast.LENGTH_LONG).show();

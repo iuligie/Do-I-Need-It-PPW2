@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#000000"
     tools:context=".list.ProductListActivity">
 
     <androidx.recyclerview.widget.RecyclerView
@@ -20,7 +21,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/list_no_reflection"
+        android:id="@+id/list_no_item"
         android:layout_width="245dp"
         android:layout_height="66dp"
         android:layout_marginStart="8dp"
