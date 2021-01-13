@@ -71,7 +71,7 @@ public class ProductApi extends Application {
 
     public void deleteItem(String itemId)
     {
-        db.collection("Reflection").document(itemId)
+        db.collection("Products").document(itemId)
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     Log.d("DELETE-LOG", "DocumentSnapshot successfully deleted!");

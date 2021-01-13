@@ -49,7 +49,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     private TextView reflectionDate;
     private ImageView imageView;
     Product current;
-
+    private boolean hasNewImg=false;
     ProductApi api=ProductApi.getInstance();
 
     private String currentUserId;
@@ -106,7 +106,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
                     .fit()
                     .into(imageView);
             //imageUri= current.getImageUrl();
-            saveButton.setText("Update");
+            saveButton.setText(R.string.Update);
         }
 
         if (ProductApi.getInstance() != null) {
@@ -152,62 +152,62 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     }
     private void updateItem(final Product item){
 
+
+
+            //region Image Handler
+            final StorageReference filepath = storageReference.child("img_items").child("my_item_" + Timestamp.now().getSeconds());
+            //making the image filenames unique with timestamp
+            if (imageUri!=null && hasNewImg) {
+                filepath.putFile(imageUri)
+                        .addOnSuccessListener
+                                (taskSnapshot -> filepath.getDownloadUrl()
+                                        .addOnSuccessListener(uri -> {
+                                            String imageUrl = uri.toString();
+                                            item.setImageUrl(imageUrl);
+                                            handleDoc(item);
+                                        })
+                                        .addOnFailureListener(e -> Log.d(TAG, "onFailure: " + e.getMessage()))
+                                )
+                        .addOnFailureListener(e -> progressBar.setVisibility(View.INVISIBLE));
+            }else
+            {
+                handleDoc(item);
+            }
+//endregion
+       // }
+
+
+
+
+    }
+    private void handleDoc(Product item)
+    {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final String title = titleEdittext.getText().toString().trim();
         final String price = reflectionEditText.getText().toString().trim();
-      //  if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) ) {
-            //region Image Handler
-            final StorageReference filepath = storageReference.child("reflection_images").child("my_image_" + Timestamp.now().getSeconds());
-            //making the image filenames unique with timestamp
-            if (!imageUri.toString().equals(item.getImageUrl()) && imageUri!=null)
-            filepath.putFile(imageUri)
-                    .addOnSuccessListener
-                            (
-                            taskSnapshot -> filepath.getDownloadUrl()
-                    .addOnSuccessListener(
-                            uri -> {
 
-                String imageUrl = uri.toString();
-//region docHandler
-                DocumentReference itemRef = db
-                        .collection("Reflection")
-                        .document(item.getItemId());
+        if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) ) {
+            //region docHandler
+            DocumentReference itemRef = db
+                    .collection("Products")
+                    .document(item.getItemId());
 
-                /*itemRef.update(
-                        "title", title,
-                        "price", price,
-                        "imageUrl", imageUrl
-                ).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(PostProductActivity.this, "Item updated!", Toast.LENGTH_LONG).show();
-                            startActivity(new Intent(PostProductActivity.this, ProductListActivity.class));
-                            finish();
-                        } else {
-                            Toast.makeText(PostProductActivity.this, "Something went wrong - check log", Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-                */
-                //endregion
-
-
-            }
-                                         )
-                    .addOnFailureListener(
-                            e -> Log.d(TAG, "onFailure: " + e.getMessage())
-                                         )
-                            )
-                    .addOnFailureListener(
-                            e -> progressBar.setVisibility(View.INVISIBLE)
-                                         );
-
-       // }
+            itemRef.update(
+                    "title", title,
+                    "price", price,
+                    "imageUrl", item.getImageUrl()
+            ).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(PostProductActivity.this, "Item updated!", Toast.LENGTH_LONG).show();
+                    api.setCurrentItemPos(null);
+                    startActivity(new Intent(PostProductActivity.this, ProductListActivity.class));
+                    finish();
+                } else {
+                    Toast.makeText(PostProductActivity.this, "Something went wrong - check log", Toast.LENGTH_LONG).show();
+                }
+            });
+        }
         //endregion
-
-
-
     }
     private void saveItem() {
 
@@ -257,8 +257,13 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
 
         if (requestCode == GALLERY_CODE && resultCode == RESULT_OK) {
             if (data != null) {
+
                 imageUri = data.getData(); //we have the actual path
                 imageView.setImageURI(imageUri); //show image
+                if(current!=null)
+                {
+                    hasNewImg=true;
+                }
             }
         }
     }
@@ -274,6 +279,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onStop() {
         super.onStop();
+        api.setCurrentItemPos(null);
         if (firebaseAuth != null) {
             firebaseAuth.removeAuthStateListener(authStateListener);
         }
