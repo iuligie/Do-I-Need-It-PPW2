@@ -3,12 +3,14 @@ package emanuelg.ppw2.doineedit.ui;
 import android.content.Context;
 import android.content.Intent;
 import android.text.format.DateUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -20,6 +22,7 @@ import emanuelg.ppw2.doineedit.R;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -44,7 +47,7 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
 
         View view = LayoutInflater.from(context).inflate(R.layout.item_row, parent, false);
         api.setProductList(productList);
-
+        view.findViewById(R.id.img_progressBar).setVisibility(View.INVISIBLE);
         return new ViewHolder(view, context);
     }
 
@@ -53,7 +56,6 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
 
         Product product = productList.get(position);
         String imageUrl;
-
         holder.title.setText(product.getTitle());
         holder.price.setText(product.getPrice());
         holder.owned.setChecked(product.isOwned());
@@ -62,12 +64,22 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
 
         String timeAgo = (String) DateUtils.getRelativeTimeSpanString(product.getTimeAdded().getSeconds() *1000);
         holder.dateAdded.setText(timeAgo);
-
+        holder.img_progressBar.setVisibility(View.VISIBLE);
         //use picasso library to download and show image
         Picasso.get().load(imageUrl)
                 .placeholder(R.drawable.ic_launcher_foreground)
                 .fit()
-                .into(holder.image);
+                .into(holder.image,new Callback() {
+                    @Override
+                    public void onSuccess() {
+                        holder.img_progressBar.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.d("IMG-ERROR","Something went wrong when loading the image");
+                    }
+                });
 
     }
 
@@ -85,6 +97,7 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
         public TextView title, price, dateAdded, name;
         public ImageView image;
         public CheckBox owned;
+        public ProgressBar img_progressBar;
        // String userId;
         //String username;
 
@@ -96,6 +109,8 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
             dateAdded = itemView.findViewById((R.id.product_time_stamp));
             image = itemView.findViewById(R.id.img_item);
             owned=itemView.findViewById(R.id.owned_checkbox);
+            img_progressBar=itemView.findViewById(R.id.img_progressBar);
+            img_progressBar.setVisibility(View.VISIBLE);
 
             owned.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 Product item = getItemAt(getAdapterPosition());
@@ -107,18 +122,15 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
                 itemRef.update("owned", isChecked
                 ).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Toast.makeText(ctx, "New item set to owned!", Toast.LENGTH_LONG).show();
+                       // Toast.makeText(ctx, "New item set to owned!", Toast.LENGTH_LONG).show();
 
                     } else {
                         Toast.makeText(ctx, "Something went wrong - check log", Toast.LENGTH_LONG).show();
                     }
                 });
             });
-            //name = itemView.findViewById(R.id.username_account);
             itemView.setOnLongClickListener(v -> {
-                Toast.makeText(v.getContext(), "Long Click Detected", Toast.LENGTH_LONG).show();
-                //Intent intent = ;
-                //intent.putExtra("itemPos", getAdapterPosition());
+                Toast.makeText(v.getContext(), "Long Press Detected - Edit Item", Toast.LENGTH_LONG).show();
                 ProductApi api=ProductApi.getInstance();
                 api.setCurrentItemPos(Integer.toString(getAdapterPosition()));
                 ctx.startActivity(new Intent(v.getContext(), PostProductActivity.class));
