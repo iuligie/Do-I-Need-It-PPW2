@@ -23,13 +23,11 @@ public class Product {
     private Timestamp timeAdded;
     private String itemId;
 
-    public boolean isOwned() {
-        return owned;
-    }
 
-    public void setOwned(boolean owned) {
-        this.owned = owned;
-    }
+
+    private String itemUrl;
+
+
 
     private boolean owned;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -40,7 +38,7 @@ public class Product {
 
     }
 
-    public Product(String title, String price, String imageUrl, String userId, Timestamp timeAdded, String itemId, boolean owned) {
+    public Product(String title, String price, String imageUrl, String userId, Timestamp timeAdded, String itemId, boolean owned, String itemUrl) {
         this.title = title;
         this.price = price;
         this.imageUrl = imageUrl;
@@ -48,6 +46,7 @@ public class Product {
         this.timeAdded = timeAdded;
         this.itemId = itemId;
         this.owned=owned;
+        this.itemUrl=itemUrl;
     }
 
 
@@ -99,7 +98,20 @@ public class Product {
     public void setItemId(String itemId) {
         this.itemId = itemId;
     }
+    public String getItemUrl() {
+        return itemUrl;
+    }
 
+    public void setItemUrl(String itemUrl) {
+        this.itemUrl = itemUrl;
+    }
+    public boolean isOwned() {
+        return owned;
+    }
+
+    public void setOwned(boolean owned) {
+        this.owned = owned;
+    }
     public Serializable toMap() {
         Map<String,String> map = new HashMap<>();
         map.put("title",getTitle());

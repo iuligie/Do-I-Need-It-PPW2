@@ -27,6 +27,7 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.util.Date;
+import java.util.UUID;
 
 import emanuelg.ppw2.doineedit.list.ProductListActivity;
 import emanuelg.ppw2.doineedit.model.Product;
@@ -44,6 +45,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
     private EditText priceEdittext;
     private TextView currentUserTextView;
     private TextView entryDate;
+    private EditText urlEdittext;
     private ImageView imageView;
     Product current;
     private boolean hasNewImg=false;
@@ -78,9 +80,9 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
         titleEdittext = findViewById(R.id.post_title_et);
         priceEdittext = findViewById(R.id.post_description_et);
         saveButton = findViewById(R.id.post_save_item_button);
-        currentUserTextView = findViewById(R.id.post_username_textview);
+        //currentUserTextView = findViewById(R.id.post_username_textview);
         addPhotoButton = findViewById(R.id.postCameraButton);
-
+        urlEdittext = findViewById(R.id.post_url_et);
         imageView = findViewById(R.id.post_imageView);
 
         saveButton.setOnClickListener(this);
@@ -96,6 +98,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
           current = api.getProductList().get(Integer.parseInt(itemPos));
             titleEdittext.setText(current.getTitle());
             priceEdittext.setText(current.getPrice());
+            urlEdittext.setText(current.getItemUrl());
             //imageView.setImageURI(current.getImageUrl());
             //use picasso library to download and show image
             Picasso.get().load(current.getImageUrl())
@@ -110,7 +113,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
             currentUserId = ProductApi.getInstance().getUserId();
             currentUserName = ProductApi.getInstance().getUsername();
 
-            currentUserTextView.setText(currentUserName);
+           // currentUserTextView.setText(currentUserName);
         }
 
         authStateListener = firebaseAuth -> {
@@ -182,6 +185,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         final String title = titleEdittext.getText().toString().trim();
         final String price = priceEdittext.getText().toString().trim();
+        final String url_item=urlEdittext.getText().toString();
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) ) {
             //region docHandler
             DocumentReference itemRef = db
@@ -191,7 +195,8 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
             itemRef.update(
                     "title", title,
                     "price", price,
-                    "imageUrl", item.getImageUrl()
+                    "imageUrl", item.getImageUrl(),
+                    "itemUrl", url_item
             ).addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     Toast.makeText(PostProductActivity.this, "Item updated!", Toast.LENGTH_LONG).show();
@@ -209,7 +214,7 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
 
         final String title = titleEdittext.getText().toString().trim();
         final String price = "£" + priceEdittext.getText().toString().trim();
-
+        final String url_item = urlEdittext.getText().toString();
         progressBar.setVisibility(View.VISIBLE);
 
         if (!TextUtils.isEmpty(title) && !TextUtils.isEmpty(price) && imageUri != null) {
@@ -222,18 +227,16 @@ public class PostProductActivity extends AppCompatActivity implements View.OnCli
                 String imageUrl = uri.toString();
 
                 // create journal object, invoke collectionRef, save journal instance
-
                 Product product = new Product();
                 product.setTitle(title);
                 product.setPrice(price);
                 product.setImageUrl(imageUrl);
                 product.setTimeAdded(new Timestamp(new Date()));
-                product.setItemId(currentUserName);
                 product.setUserId(currentUserId);
-
+                product.setItemUrl(url_item);
                 collectionReference.add(product).addOnSuccessListener(documentReference -> {
                     progressBar.setVisibility(View.INVISIBLE);
-
+                    product.setItemId(documentReference.getId());
                     startActivity(new Intent(PostProductActivity.this, ProductListActivity.class));
                     finish();
                 })

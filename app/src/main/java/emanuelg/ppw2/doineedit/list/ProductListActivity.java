@@ -29,6 +29,7 @@ import java.util.List;
 import emanuelg.ppw2.doineedit.MainActivity;
 import emanuelg.ppw2.doineedit.PostProductActivity;
 import emanuelg.ppw2.doineedit.R;
+import emanuelg.ppw2.doineedit.authentication.LoginActivity;
 import emanuelg.ppw2.doineedit.model.Product;
 import emanuelg.ppw2.doineedit.ui.ProductRecyclerAdapter;
 import emanuelg.ppw2.doineedit.util.ProductApi;
@@ -129,7 +130,7 @@ public class ProductListActivity extends AppCompatActivity {
                 //sign out
                 if (user != null && firebaseAuth != null){
                     firebaseAuth.signOut();
-                    startActivity(new Intent(ProductListActivity.this, MainActivity.class));
+                    startActivity(new Intent(ProductListActivity.this, LoginActivity.class));
                     //finish();
                 }
                 break;

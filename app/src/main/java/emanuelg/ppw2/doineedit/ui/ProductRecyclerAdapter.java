@@ -1,7 +1,10 @@
 package emanuelg.ppw2.doineedit.ui;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -112,6 +115,31 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
             img_progressBar=itemView.findViewById(R.id.img_progressBar);
             img_progressBar.setVisibility(View.VISIBLE);
 
+            //Product item = getItemAt(getAdapterPosition());
+            itemView.setOnClickListener(v -> new AlertDialog.Builder(itemView.getContext())
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setTitle("Closing Activity")
+                    .setMessage("This action will be opened in another application!")
+                    .setPositiveButton("Confirm", new DialogInterface.OnClickListener()
+                    {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            String item_url=getItemAt(getAdapterPosition()).getItemUrl();
+                            if(item_url==null ){Log.d("URL","URL is NULL");}
+                            else
+                            {if(!(item_url.startsWith("http://") || item_url.startsWith("https://")))
+                            {
+                                item_url="http://" + item_url;
+                            }
+                            Uri uri = Uri.parse(item_url); // missing 'http://' will cause crashed
+                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+                            ctx.startActivity(intent);}
+                        }
+
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show());
+
             owned.setOnCheckedChangeListener((buttonView, isChecked) -> {
                 Product item = getItemAt(getAdapterPosition());
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -129,6 +157,7 @@ public class ProductRecyclerAdapter extends RecyclerView.Adapter<ProductRecycler
                     }
                 });
             });
+
             itemView.setOnLongClickListener(v -> {
                 Toast.makeText(v.getContext(), "Long Press Detected - Edit Item", Toast.LENGTH_LONG).show();
                 ProductApi api=ProductApi.getInstance();

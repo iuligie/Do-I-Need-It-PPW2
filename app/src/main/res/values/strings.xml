@@ -10,7 +10,7 @@
     <string name="or">Or</string>
     <string name="create_account">Create Account</string>
     <string name="username_hint">Username</string>
-    <string name="product_title">Product title</string>
+    <string name="product_title">*Product title</string>
     <string name="menu_title">Add Product</string>
     <string name="Signout">Sign Out</string>
     <string name="signout">Sign Out</string>
@@ -55,7 +55,7 @@
     <string name="todo">TODO</string>
     <string name="manage_your_needs_now">Manage your needs now!</string>
     <string name="save">Save</string>
-    <string name="price_in_gbp">Price in GBP</string>
+    <string name="price_in_gbp">*Price in GBP</string>
     <string name="textview">TextView</string>
     <string name="today">Today</string>
     <string name="Update">Update</string>
